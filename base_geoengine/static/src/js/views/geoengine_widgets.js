@@ -332,7 +332,6 @@ var FieldGeoRect = common.AbstractField.extend({
 
         var miny = Math.min(y1, y2);
         var maxy = Math.max(y1, y2);
-
         return [[minx, miny], [maxx, maxy]];
     },
     on_ui_change: function() {
