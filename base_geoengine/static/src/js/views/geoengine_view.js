@@ -14,6 +14,8 @@ odoo.define('base_geoengine.GeoengineView', function (require) {
  *---------------------------------------------------------*/
 
 var core = require('web.core');
+var data = require('web.data');
+var pyeval = require('web.pyeval');
 var time = require('web.time');
 var View = require('web.View');
 
@@ -91,6 +93,7 @@ var formatHTML = function(a, fields) {
     return str.join('<br />');
 };
 
+
 var GeoengineView = View.extend(geoengine_common.GeoengineMixin, {
     template: "GeoengineView",
     display_name: _lt('Geoengine'),
@@ -113,10 +116,11 @@ var GeoengineView = View.extend(geoengine_common.GeoengineMixin, {
             new OpenLayers.Control.SelectFeature(
             {selectedFeatures:[]}, {hover: true, highlightOnly: true}),
             new OpenLayers.Control.SelectFeature(
-                {selectedFeatures:[]}, {})
+                {selectedFeatures:[]}, {}),
         ];
         this.selectFeatureControls[0].handlers.feature.stopDown = false;
         this.selectFeatureControls[1].handlers.feature.stopDown = false;
+
     },
     load_view: function(context) {
         var self = this;
@@ -226,6 +230,8 @@ var GeoengineView = View.extend(geoengine_common.GeoengineMixin, {
                     },
                     "featureunselected": function() {
                         $("#map_infobox").hide();
+                    },
+                    "featureopen": function() {
                     }
                 }
             }
@@ -393,8 +399,10 @@ var GeoengineView = View.extend(geoengine_common.GeoengineMixin, {
         this.map.addLayers(this.vectorLayers);
         _.each(this.selectFeatureControls, function(ctrl) {
             ctrl.setLayer(self.vectorLayers);
-            ctrl.activate();
         });
+        // Only activate highlight feature controle
+        // the other select control is handled by click handler
+        // XXX this.selectFeatureControls[0].activate();
         _.each(this.vectorLayers, function(vlayer) {
             // keep only one vector layer active at startup
             if (vlayer != self.vectorLayers[0]) {
@@ -432,6 +440,7 @@ var GeoengineView = View.extend(geoengine_common.GeoengineMixin, {
     },
 
     render_map: function() {
+        var self = this;
         //TODO: copy this mapbox dark theme in the addons
         if (_.isUndefined(this.map)){
             OpenLayers.ImgPath = "//dr0duaxde13i9.cloudfront.net/theme/dark/";
@@ -455,6 +464,47 @@ var GeoengineView = View.extend(geoengine_common.GeoengineMixin, {
                 }
             }
             this.map.addControls(this.selectFeatureControls);
+            this.clickHandler = new OpenLayers.Handler.Click(
+                this.selectFeatureControls[1], {
+                    click: function(evt) {
+                        var feature = this.layer.getFeatureFromEvent(evt);
+                        if (feature) {
+                            this.select(feature);
+                        }
+                        // XXX features selection array where is it ?? this.layer.selectedFeatures
+                        if(this.layer.selectedFeatures) {
+                            this.unselect(this.layer.selectedFeatures[0]);
+                        }
+                    },
+                    dblclick: function(evt) {
+                        var feature = this.layer.getFeatureFromEvent(evt);
+                        if (feature) {
+                            self.open_record(feature);
+                        }
+                    },
+                }, {
+                    single: true,
+                    double: true,
+                    stopSingle: true,
+                    stopDouble: true,
+                }
+            );
+            this.clickHandler.activate();
+            this.hoverHandler = new OpenLayers.Handler.Hover(
+                this.selectFeatureControls[0], {
+                    move: function(evt) {
+                        var feature = this.layer.getFeatureFromEvent(evt);
+                        if (feature) {
+                            this.highlight(feature);
+                        } else {
+                            if(this.layer.selectedFeatures) {
+                                this.unhighlight(this.layer.selectedFeatures[0]);
+                            }
+                        }
+                    }
+                }
+            );
+            this.hoverHandler.activate();
             this.map.zoomToMaxExtent();
         }
     },
@@ -467,6 +517,14 @@ var GeoengineView = View.extend(geoengine_common.GeoengineMixin, {
         core.bus.on('DOM_updated', self.view_manager.is_in_DOM, function () {
             self.render_map();
         });
+    },
+
+    open_record: function (feature, options) {
+        if (this.dataset.select_id(feature.data.id)) {
+            this.do_switch_view('form', null, options); //, null, { mode: "edit" });
+        } else {
+            this.do_warn("Kanban: could not find id#" + feature.data.id);
+        }
     },
 
 });
