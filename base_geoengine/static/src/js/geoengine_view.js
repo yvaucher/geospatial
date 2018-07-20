@@ -104,6 +104,37 @@ openerp.base_geoengine = function(openerp) {
         _.each(bg_layers, function(l) {
             switch (l.raster_type) {
                 case "osm":
+                    var resolutions = [
+                        1.194328566789627,
+                        0.5971642833948135,
+                        0.29858214169740677,
+                        // additional resolutions that doesn't exists on server
+                        0.14929107084870338,
+                        0.07464553542435169
+                    ];
+                    //var serverResolutions = resolutions.slice(0, 20);
+                    var serverResolutions = [
+                        156543.03390625,
+                        78271.516953125,
+                        39135.7584765625,
+                        19567.87923828125,
+                        9783.939619140625,
+                        4891.9698095703125,
+                        2445.9849047851562,
+                        1222.9924523925781,
+                        611.4962261962891,
+                        305.74811309814453,
+                        152.87405654907226,
+                        76.43702827453613,
+                        38.218514137268066,
+                        19.109257068634033,
+                        9.554628534317017,
+                        4.777314267158508,
+                        2.388657133579254,
+                        1.194328566789627,
+                        0.5971642833948135,
+                        0.29858214169740677,
+                    ];
                     out.push(
                         new OpenLayers.Layer.OSM(
                             l.name,
@@ -111,7 +142,9 @@ openerp.base_geoengine = function(openerp) {
                                 attribution: "<a href='http://www.camptocamp.com' style='color:orange;font-weight:bold;background-color:#FFFFFF' target='_blank'>Powered by Camptocamp</a>\
                                               using <a href='http://www.openstreetmap.org/' target='_blank'>OpenStreetMap</a> raster",
                                 buffer: 1,
-                                transitionEffect: 'resize'
+                                transitionEffect: 'resize',
+                                serverResolutions: serverResolutions,
+                                resolutions: resolutions,
                             }));
                     break;
                 case "mapbox":
