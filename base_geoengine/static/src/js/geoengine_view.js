@@ -375,7 +375,7 @@ openerp.base_geoengine = function(openerp) {
                     end_color.setFromHex(cfg.end_color || DEFAULT_END_COLOR);
                     switch (cfg.classification) {
                         case "unique":
-                            vl.styleMap = this.getUniqueValuesStyleMap(cfg, features);
+                            this.getUniqueValuesStyleMap(vl, cfg, features);
                             break;
                         case "quantile":
                             geostat = new mapfish.GeoStat.Choropleth(map, {
@@ -427,7 +427,7 @@ openerp.base_geoengine = function(openerp) {
             }
         },
 
-        getUniqueValuesStyleMap: function(cfg, features) {
+        getUniqueValuesStyleMap: function(vl, cfg, features) {
             if (jQuery.isEmptyObject(features)) {
                 return;
             }
@@ -461,8 +461,7 @@ openerp.base_geoengine = function(openerp) {
                     l += 1;
                 }
             }
-            // display them
-            return new OpenLayers.StyleMap({
+            var new_style = new OpenLayers.StyleMap({
                 'default': new OpenLayers.Style(
                     OpenLayers.Util.applyDefaults({
                         fillColor: "${color}",
@@ -476,6 +475,15 @@ openerp.base_geoengine = function(openerp) {
                     }),
                 'select': STYLE_SELECT
             });
+            var test='aa';
+            // display them
+            vl.styleMap.styles.default.defaultStyle.fillColor = "${color}";
+            vl.styleMap.styles.default.context.color = function(f) {
+                return (f.attributes.hasOwnProperty(v) && distinct.hasOwnProperty(f.attributes[v])) ?
+                    '#' + distinct[f.attributes[v]] : "#ffffff";
+            };
+            vl.styleMap.styles.default.propertyStyles.fillColor = true;
+
         },
         /**
             * Method: createVectorLayers
