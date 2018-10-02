@@ -56,7 +56,7 @@ var FieldGeoEngineEditMap = AbstractField.extend(geoengine_common.GeoengineMixin
         });
     },
 
-    create_layers: function(self, field_infos) {
+    create_layersAbstractFieldself, field_infos) {
         this.vector_layer = this.create_vector_layer();
         this.raster_layers = this.createBackgroundLayers([field_infos.edit_raster]);
         this.raster_layers[0].isBaseLayer = true;
@@ -78,7 +78,7 @@ var FieldGeoEngineEditMap = AbstractField.extend(geoengine_common.GeoengineMixin
         if (this.map) {
             return;
         }
-        this.view.on("change:actual_mode", this, this.on_mode_change);
+        this.view.on("change:actual_mode", this, this.on_mode_change); // TODO: find way to fix that
         var self = this;
         // add a listener on parent tab if it exists in order to refresh geoengine view
         // we need to trigger it on DOM update for changes from view to edit mode
@@ -505,14 +505,6 @@ var FieldGeoRectReadonly = FieldGeoRect.extend({
         this.invalid = false;
     }
 });
-
-core.form_widget_registry
-    .add('geo_edit_map', FieldGeoEngineEditMap)
-    .add('geo_edit_map_readonly', FieldGeoEngineEditMapReadonly)
-    .add('geo_point_xy', FieldGeoPointXY)
-    .add('geo_point_xy', FieldGeoPointXYReadonly)
-    .add('geo_rect', FieldGeoRect)
-    .add('geo_rect', FieldGeoRectReadonly);
 
 return {
     FieldGeoEngineEditMap: FieldGeoEngineEditMap,
