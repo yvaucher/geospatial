@@ -13,7 +13,7 @@
                     <field name="sequence"/>
                     <field name="overlay"/>
                     <field name="use_to_edit" colspan="4"/>
-                    <field name="url" colspan="4" widget="url" attrs="{'required': [('is_wmts', '=', True)]}"/>
+                    <field name="url" colspan="4" widget="url" attrs="{'required': [('is_wmts', '=', True)], 'invisible': [('raster_type', '=', 'swisstopo')]}"/>
                 </group>
                 <field name="is_wmts" invisible="1"/>
                 <group string="WMTS options"
@@ -29,6 +29,12 @@
                   <field name="server_resolutions"/>
                   <field name="dimensions"/>
                   <field name="params"/>
+                </group>
+                <group string="Swisstopo WMTS options"
+                       attrs="{'invisible': [('raster_type', '!=', 'swisstopo')]}"
+                       colspan="4">
+                  <field name="layername"/>
+                  <field name="format_suffix"/>
                 </group>
                 <field name="has_type" invisible="1"/>
                 <group string="Layer data"

@@ -121,6 +121,34 @@ odoo.define('base_geoengine.geoengine_common', function (require) {
                                 })
                             );
                             break;
+                        case "swisstopo":
+                            var urls = [];
+                            ['10', '11', '12', '13', '14'].map(function(i) {
+                                var url = 'https://wmts{i}.geo.admin.ch/1.0.0/{layer}/default/{time}/3857/{z}/{x}/{y}.{format}';
+                                url = url.replace('{i}', i);
+                                url = url.replace('{layer}', l.layername || 'ch.swisstopo.pixelkarte-farbe');
+                                url = url.replace('{time}', l.time || 'current');
+                                url = url.replace('{format}', l.format_suffix || 'jpeg');
+                                urls.push(url);
+                            });
+                            var source = new ol.source.XYZ({
+                                attributions: [
+                                    new ol.Attribution({
+                                        html: '<a target="_blank" href="http://www.swisstopo.admin.ch">swisstopo</a>'
+                                    })
+                                ],
+                                urls: urls,
+                                maxZoom: 17
+                            });
+                            out.push(
+                                new ol.layer.Tile({
+                                    title: l.name,
+                                    visible: !l.overlay,
+                                    type: 'base',
+                                    source: source
+                                })
+                            );
+                            break;
                     }
                 }
             });

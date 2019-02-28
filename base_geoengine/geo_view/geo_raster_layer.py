@@ -25,12 +25,14 @@ class GeoRasterLayer(models.Model):
         [('osm', 'OpenStreetMap'),
          ('wmts', 'WMTS'),
          ('d_wms', 'Distant WMS'),
+         ('swisstopo', 'Swisstopo'),
          ('odoo', 'Odoo field')],
         string="Raster layer type",
         default='osm',
         required=True)
     name = fields.Char(
         'Layer Name', size=256, translate=True, required=True)
+    layername = fields.Char('Layer Machine Name')
     url = fields.Char('Service URL', size=1024)
 
     # technical field to display or not wmts options
