@@ -134,7 +134,7 @@ odoo.define('base_geoengine.geoengine_common', function (require) {
                             var source = new ol.source.XYZ({
                                 attributions: [
                                     new ol.Attribution({
-                                        html: '<a target="_blank" href="http://www.swisstopo.admin.ch">swisstopo</a>'
+                                        html: '<a target="_blank" href="https://www.swisstopo.admin.ch">swisstopo</a>'
                                     })
                                 ],
                                 urls: urls,
